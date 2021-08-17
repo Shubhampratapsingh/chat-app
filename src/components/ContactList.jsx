@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import 'emoji-mart/css/emoji-mart.css'
-import { Picker } from 'emoji-mart'
+import Picker from "emoji-picker-react";
+import 'emoji-mart/css/emoji-mart.css';
 import './style.css';
 import Profilecard from './ProfileCard';
 import { getMessage, getUsers, sendMessage } from '../actions';
@@ -29,6 +29,17 @@ const ContactList = () => {
   const [chatUserSummary, setChatUserSummary] = useState('');
   const [message, setMessage] = useState('');
   const [userUid, setUserUid] = useState(null);
+  const [chosenEmoji, setChosenEmoji] = useState(false);
+
+  const ref = useRef(null);
+  const onEmojiClick = (event, emojiObject) => {
+    const cursor = ref.current.selectionStart;
+    const text =
+      message.slice(0, cursor) + emojiObject.emoji + message.slice(cursor);
+    setMessage(text);
+  };
+
+  const onButtonClick = () => setChosenEmoji(true);
 
   useEffect(() => {
     dispatch(getUsers(auth.uid));
@@ -57,7 +68,8 @@ const ContactList = () => {
     if (message !== '') {
       dispatch(sendMessage(msgObj))
         .then(() => {
-          setMessage('')
+          setMessage('');
+          setChosenEmoji(false);
         })
     }
   };
@@ -120,11 +132,14 @@ const ContactList = () => {
             <div className="row">
               <div className="col-12" id="chatInput">
                 <div className="chat-box-tray">
-                  <button className='button-emoji'>&#128515;</button>
+                  <button className='button-emoji' onClick={onButtonClick} >&#128515;</button>
+                  {chosenEmoji ? <Picker onEmojiClick={onEmojiClick} /> : null}
                   <input type="text"
                     placeholder="Type your message here..."
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)} />
+                    onChange={(e) => setMessage(e.target.value)}
+                    id="text"
+                    ref={ref} />
                   <button
                     className="send-message"
                     onClick={submitMessage}>

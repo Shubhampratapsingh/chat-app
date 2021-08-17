@@ -193,4 +193,9 @@
     transform: translate(4px, -4px);
     background-color:#e6e6e6;
 }
+aside.emoji-picker-react {
+  position:absolute !important;
+  bottom:100%;
+
+}
 
